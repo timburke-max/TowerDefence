@@ -9,7 +9,7 @@ class Program
 {
 
     // Scherm groottes
-    const int schermBreedte = 800;
+    const int schermBreedte = 1000;
     const int schermHoogte = 600;
     
     //Lijsten van vijanden en torens
