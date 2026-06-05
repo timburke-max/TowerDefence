@@ -4,7 +4,7 @@ using TowerDefence.Interfaces;
 
 namespace TowerDefence.Model;
 
-public class BasicToren : IToren
+public class SprayToren : IToren
 {
     private float _cooldownTimer = 0.0f;
     private IVijand _currentTarget;
@@ -14,12 +14,12 @@ public class BasicToren : IToren
     public float VuurRatio { get; }
     public Vector2 Positie { get; }
 
-    public BasicToren(Vector2 position)
+    public SprayToren(Vector2 position)
     {
         Positie = position;
-        Schade = 40;
-        Afstand = 110.0f;
-        VuurRatio = 0.3f;
+        Schade = 10;
+        Afstand = 50.0f;
+        VuurRatio = 0.5f;
     }
 
     public void WerkBij(List<IVijand> vijanden, float deltaTime)
@@ -48,15 +48,15 @@ public class BasicToren : IToren
     public void Draw()
     {
         // Teken de toren als een blauw vierkant
-        Raylib.DrawRectangle((int)Positie.X - 20, (int)Positie.Y - 20, 40, 40, Color.Blue);
+        Raylib.DrawRectangle((int)Positie.X - 20, (int)Positie.Y - 20, 40, 40, Color.Gold);
 
         // Teken de range-cirkel (lichtgrijs/transparant)
-        Raylib.DrawCircleLines((int)Positie.X, (int)Positie.Y, Afstand, Color.LightGray);
+        Raylib.DrawCircleLines((int)Positie.X, (int)Positie.Y, Afstand, Color.SkyBlue);
 
         // Als de toren een doelwit heeft, teken een laserstraal
         if (_currentTarget != null && _currentTarget.IsAlive)
         {
-            Raylib.DrawLineV(Positie, _currentTarget.Position, Color.Yellow);
+            Raylib.DrawLineV(Positie, _currentTarget.Position, Color.Black);
         }
     }
 

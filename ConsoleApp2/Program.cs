@@ -1,8 +1,9 @@
-﻿using System.Numerics;
+﻿using System.ComponentModel.Design;
+using System.Numerics;
+using System.Threading.Tasks.Sources;
 using Raylib_cs;
 using TowerDefence.Interfaces;
 using TowerDefence.Model;
-
 namespace VisualDefense;
 
 class Program
@@ -11,94 +12,150 @@ class Program
     // Scherm groottes
     const int schermBreedte = 800;
     const int schermHoogte = 600;
-    
-    //Lijsten van vijanden en torens
-    static List<IVijand> enemies = new List<IVijand>();
-    static List<IToren> towers = new List<IToren>();
-    
+
+    static List<IVijand> vijanden = new List<IVijand>();
+    static List<IToren> torens = new List<IToren>();
+
     // Start- en eindpunten voor de vijanden
     static Vector2 spawnPunt = new Vector2(50, 300);
     static Vector2 doelPunt = new Vector2(750, 300);
 
     //Timer die bijhoudt wanneer vijanden moeten spawnen
     static float spawnTimer = 0.0f;
-    static float spawnTime = 1.5f;
+    static float spawnTime = 2.5f;
+    static int score = 0;
+    static int lives = 10;
+    static int level = 1;
+    static Random random = new Random();
+    static int scorenodig = 50;
+    public static void Levels()
+    {
+
+        if (score >= scorenodig)
+        {
+            level++;
+            spawnTime = spawnTime - 0.25f;
+            score = 0;
+            scorenodig = scorenodig + 50;
+
+        }
+    }
     static void Main(string[] args)
     {
         Raylib.InitWindow(schermBreedte, schermHoogte, "OOP Tower Defense Simulation");
         Raylib.SetTargetFPS(60);
-        
-        // Voeg wat torens toe
-        towers.Add(new BasicToren(new Vector2(300, 200)));
-        towers.Add(new BasicToren(new Vector2(500, 400)));
-        //TODO: Voeg ook andere soorten torens toe
 
-        // De echte Visuele Game Loop
+        torens.Add(new BasicToren(new Vector2(300, 250)));
+        torens.Add(new BasicToren(new Vector2(450, 350)));
+        torens.Add(new SniperToren(new Vector2(400, 150)));
+        torens.Add(new BasicToren(new Vector2(600, 250)));
+        torens.Add(new SprayToren(new Vector2(650, 300)));
+        torens.Add(new SprayToren(new Vector2(100, 300)));
+
         while (!Raylib.WindowShouldClose())
         {
-            update();
-            draw();
+            WerkBij();
+            Tekenen();
         }
 
         Raylib.CloseWindow();
     }
 
-    public static void update()
+    public static void WerkBij()
     {
-        //Bereken de tijd sinds de laatste frame
         float deltaTime = Raylib.GetFrameTime();
-        updateEntities(deltaTime);
-        spawnEnemies(deltaTime);         
+        WerkBijEntiteiten(deltaTime);
+        SpawnVijanden(deltaTime);
     }
 
-    /**
-     * Functie verantwoordelijk om alle entiteiten te updaten
-     */
-    public static void updateEntities(float deltaTime) {
-
-        //TODO: Zorg dat alle vijanden en torens updaten
-        //TODO: Zorg dat er iets gebeurt als een vijand het doel bereikt heeft
-    }
-
-    /**
-     * Functie verantwoordelijk voor het spawnen van vijanden
-     */
-    public static void spawnEnemies(float deltaTime) {
-        //Update de spawn timer
-        spawnTimer += deltaTime;
-        // Spawn elke paar seconden een willekeurige vijand
-        if (spawnTimer >= spawnTime)
+    public static void WerkBijEntiteiten(float deltaTime)
+    {
+        foreach (var t in torens)
         {
-            //TODO: Zorg dat een willekeurige vijand kan spawnen
-            enemies.Add(new BasicVijand(spawnPunt, doelPunt));
-            // Reset de spawn timer
-            spawnTimer = 0.0f;
+            t.WerkBij(vijanden, deltaTime);
+        }
+
+        for (int i = vijanden.Count - 1; i >= 0; i--)
+        {
+            var vijand = vijanden[i];
+            vijand.Update(deltaTime);
+
+            if (vijand.HeeftDoelBereikt)
+            {
+                lives -= 1;
+                vijanden.RemoveAt(i);
+                continue;
+            }
+
+            if (!vijand.IsAlive)
+            {
+                score += 10;
+                vijanden.RemoveAt(i);
+            }
+
         }
     }
 
-    //TODO: zorg dat er ergens een score wordt bijgehouden en getoond
+    public static void SpawnVijanden(float deltaTime)
+    {
+        spawnTimer += deltaTime;
+        if (spawnTimer >= spawnTime)
+        {
+            int randomkeuze = random.Next(3);
+            {
+                if (randomkeuze == 0)
+                    vijanden.Add(new BasicVijand(spawnPunt, doelPunt));
+                else if (randomkeuze == 1)
+                    vijanden.Add(new MINIVijand(spawnPunt, doelPunt));
+                else
+                {
+                    vijanden.Add(new TankVijand(spawnPunt, doelPunt));
+                }
+                spawnTimer = 0.0f;
+            }
+        }
 
-    public static void draw() {
+    }
+
+
+    public static void Tekenen()
+    {
         Raylib.BeginDrawing();
         Raylib.ClearBackground(Color.RayWhite);
 
-        // Teken het pad/de weg
         Raylib.DrawLineV(spawnPunt, doelPunt, Color.Gold);
         Raylib.DrawCircleV(doelPunt, 15, Color.Gold);
+        Levels();
 
-        // Teken alle torens
-        foreach (var tower in towers)
+        foreach (var toren in torens)
         {
-            tower.Draw();
+            toren.Draw();
         }
 
-        // Teken alle levende vijanden
-        foreach (var enemy in enemies)
+        foreach (var vijand in vijanden)
         {
-            enemy.Draw();
+            vijand.Draw();
         }
 
         Raylib.DrawText("Tower Defence", 10, 10, 18, Color.DarkGray);
+        Raylib.DrawText($"Score: {score}/{scorenodig}", 10, 30, 16, Color.DarkGray);
+        Raylib.DrawText($"Levens: {lives}", 10, 50, 16, Color.DarkGray);
+        Raylib.DrawText($"level: {level}/10", 10, 70, 16, Color.DarkGray);
         Raylib.EndDrawing();
+        if (lives <= 0)
+        {
+            Raylib.DrawText("Game Over!", schermBreedte / 2 - 50, schermHoogte / 2, 24, Color.Red);
+            Raylib.EndDrawing();
+            Task.Delay(2000).Wait();
+            Raylib.CloseWindow();
+        }
+        if (level > 10)
+        {
+            Raylib.DrawText("You Win!", schermBreedte / 2 - 50, schermHoogte / 2, 24, Color.Green);
+            Raylib.EndDrawing();
+            Task.Delay(2000).Wait();
+            Raylib.CloseWindow();
+        }
     }
 }
+
