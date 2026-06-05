@@ -10,4 +10,5 @@ public interface IToren : IDrawable
     Vector2 Positie { get;}
     void ValAan(float deltaTime);
     void Update(List<IVijand> enemies, float deltaTime);
+    void Draw();
 }

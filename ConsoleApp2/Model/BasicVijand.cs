@@ -1,13 +1,15 @@
 ﻿using System.Numerics;
 using Raylib_cs;
+using System.Collections.Generic;
 
 namespace TowerDefence.Model;
 
 public class BasicVijand : Vijand
 {
-    public BasicVijand(Vector2 start, Vector2 target) : base(start, target)
+
+    public BasicVijand(List<Vector2> route) : base(route)
     {
-        //TODO: maak andere vijanden met andere statistieken
+        MaximumLevensPunten = 200;
         LevensPunten = 200;
         Snelheid = 40.0f;
         Grootte = 20.0f;
