@@ -6,18 +6,26 @@ namespace TowerDefence.Model;
 
 public abstract class Vijand : IVijand
 {
-    // TODO: Voeg extra voorwaarden toe, dat levenspunten van een 
-    // vijand niet onder nul kunnen en niet boven een maximum
-    // TODO: voeg een extra property MaximumLevensPunten toe
+    
+    public int MaximumLevensPunten { get; protected set; }
+
+
     public int LevensPunten { get; protected set; }
     public Vector2 Position { get; protected set; }
     public bool IsAlive
     {
-        get {
-            //TODO zorgt dat deze getter juist teruggeeft of 
-            // de vijand nog leeft of niet.
-            return true;
-        }
+        get
+        {
+            
+            if (LevensPunten > 0)
+           {
+              return true;
+           }
+          else
+          {
+             return false;
+          }
+      }
     }
 
     protected float Snelheid;
@@ -26,31 +34,42 @@ public abstract class Vijand : IVijand
     protected float Grootte;
 
     public Vijand(Vector2 startPosition, Vector2 targetPosition)
-    {
+  {
         Position = startPosition;
         Target = targetPosition;
-    }
+   }
 
     public void Update(float deltaTime)
     {
-        //TODO: Update de vijand
-        // Zorg dat hij beweegt naar het doel en stopt op het doel
-        // Hint: gebruik de functies van Vector2
-    }
+     
+        float afstand = Vector2.Distance(Position, Target);
+        if (afstand > 2.0f)
+       {
+            Vector2 richting = Vector2.Normalize(Target - Position);
+            Position = Position + richting * Snelheid * deltaTime;
+      }
+       else
+        {
+            Position = Target;
+      }
+   }
 
     public void TakeDamage(int amount)
     {
-        //TODO: zorg dat de vijand schade krijgt
-    }
-
-    
-    public virtual void Draw()
-    {
-        if (IsAlive)
+        
+        LevensPunten = LevensPunten - amount;
+        if (LevensPunten < 0)
         {
-            Raylib.DrawCircleV(Position, Grootte, EnemyColor);
-            // Teken een klein rood levensbalkje boven hun hoofd
-            Raylib.DrawRectangle((int)Position.X - 15, (int)Position.Y - (int)Grootte - 10, (int)(LevensPunten / 3.33f), 4, Color.Green);
+            LevensPunten = 0;
         }
     }
+    public virtual void Draw()   
+  {
+        if (IsAlive)
+    {
+        Raylib.DrawCircleV(Position, Grootte, EnemyColor);
+        
+        Raylib.DrawRectangle((int)Position.X - 15, (int)Position.Y - (int)Grootte - 10, (int)(LevensPunten / 3.33f), 4, Color.Green);
+    }
+  }
 }

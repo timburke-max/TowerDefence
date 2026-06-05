@@ -9,4 +9,5 @@ public interface IVijand : IDrawable
     bool IsAlive { get; }
     void Update(float deltaTime);
     void TakeDamage(int amount);
+    
 }

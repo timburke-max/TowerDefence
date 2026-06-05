@@ -5,35 +5,35 @@ using TowerDefence.Model;
 
 namespace VisualDefense;
 
-class Program
+class Programa
 {
-
-    // Scherm groottes
+    
     const int schermBreedte = 800;
     const int schermHoogte = 600;
     
-    //Lijsten van vijanden en torens
     static List<IVijand> enemies = new List<IVijand>();
     static List<IToren> towers = new List<IToren>();
     
-    // Start- en eindpunten voor de vijanden
     static Vector2 spawnPunt = new Vector2(50, 300);
     static Vector2 doelPunt = new Vector2(750, 300);
-
-    //Timer die bijhoudt wanneer vijanden moeten spawnen
+ 
+   
     static float spawnTimer = 0.0f;
     static float spawnTime = 1.5f;
+    
+    static int score = 0;
+    static Random random = new Random();
     static void Main(string[] args)
     {
         Raylib.InitWindow(schermBreedte, schermHoogte, "OOP Tower Defense Simulation");
-        Raylib.SetTargetFPS(60);
-        
-        // Voeg wat torens toe
+        Raylib.SetTargetFPS(60); Matrix3x2:
+
         towers.Add(new BasicToren(new Vector2(300, 200)));
         towers.Add(new BasicToren(new Vector2(500, 400)));
-        //TODO: Voeg ook andere soorten torens toe
+        towers.Add(new BasicToren(new Vector2(434, 348)));
+        towers.Add(new BasicToren_1(new Vector2(450, 392)));
+     
 
-        // De echte Visuele Game Loop
         while (!Raylib.WindowShouldClose())
         {
             update();
@@ -42,63 +42,85 @@ class Program
 
         Raylib.CloseWindow();
     }
-
     public static void update()
     {
-        //Bereken de tijd sinds de laatste frame
+     
         float deltaTime = Raylib.GetFrameTime();
         updateEntities(deltaTime);
-        spawnEnemies(deltaTime);         
+        spawnEnemies(deltaTime);
     }
 
-    /**
-     * Functie verantwoordelijk om alle entiteiten te updaten
-     */
-    public static void updateEntities(float deltaTime) {
-
-        //TODO: Zorg dat alle vijanden en torens updaten
-        //TODO: Zorg dat er iets gebeurt als een vijand het doel bereikt heeft
-    }
-
-    /**
-     * Functie verantwoordelijk voor het spawnen van vijanden
-     */
-    public static void spawnEnemies(float deltaTime) {
-        //Update de spawn timer
-        spawnTimer += deltaTime;
-        // Spawn elke paar seconden een willekeurige vijand
-        if (spawnTimer >= spawnTime)
+   
+    public static void updateEntities(float deltaTime)
+    {
+        
+        foreach (var toren in towers)
         {
-            //TODO: Zorg dat een willekeurige vijand kan spawnen
-            enemies.Add(new BasicVijand(spawnPunt, doelPunt));
-            // Reset de spawn timer
-            spawnTimer = 0.0f;
+            toren.Update(enemies, deltaTime);
+        }
+
+        for (int i = enemies.Count - 1; i >= 0; i--)
+        {
+            IVijand vijand = enemies[i];
+            vijand.Update(deltaTime);
+
+            
+            float afstandTotDoel = Vector2.Distance(vijand.Position, doelPunt);
+            if (afstandTotDoel <= 5.0f)
+            {
+                enemies.RemoveAt(i);
+                Console.WriteLine("VIJAND HEEFT ZIJN DOEL BEREIKT!");
+            }
+            else if (vijand.IsAlive == false)
+            {
+                score = score + 10;
+                enemies.RemoveAt(i);
+            }
         }
     }
+ 
+    public static void spawnEnemies(float deltaTime)
+    {
+        
+        spawnTimer += deltaTime;
+        
+        if (spawnTimer >= spawnTime)
+        {
+            
 
-    //TODO: zorg dat er ergens een score wordt bijgehouden en getoond
-
-    public static void draw() {
+            int keuze = random.Next(1, 3);
+            if (keuze == 1)
+            {
+                enemies.Add(new BasicVijand(spawnPunt, doelPunt));
+            }
+            else
+            {
+                enemies.Add(new SnelleVijand(spawnPunt, doelPunt));
+            }
+        
+          spawnTimer = 0.0f;
+        }
+    }
+  
+    public static void draw()
+    {
         Raylib.BeginDrawing();
         Raylib.ClearBackground(Color.RayWhite);
-
-        // Teken het pad/de weg
+      
         Raylib.DrawLineV(spawnPunt, doelPunt, Color.Gold);
         Raylib.DrawCircleV(doelPunt, 15, Color.Gold);
-
-        // Teken alle torens
+        
         foreach (var tower in towers)
         {
             tower.Draw();
         }
-
-        // Teken alle levende vijanden
+     
         foreach (var enemy in enemies)
         {
             enemy.Draw();
         }
-
         Raylib.DrawText("Tower Defence", 10, 10, 18, Color.DarkGray);
+        Raylib.DrawText("Score: " + score, 10, 40, 20, Color.Black);
         Raylib.EndDrawing();
     }
 }
