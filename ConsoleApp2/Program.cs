@@ -1,5 +1,6 @@
-﻿using System.Numerics;
-using Raylib_cs;
+﻿using Raylib_cs;
+using System.Numerics;
+using TowerDefence;
 using TowerDefence.Interfaces;
 using TowerDefence.Model;
 
@@ -31,7 +32,7 @@ class Programa
         towers.Add(new BasicToren(new Vector2(300, 200)));
         towers.Add(new BasicToren(new Vector2(500, 400)));
         towers.Add(new BasicToren(new Vector2(434, 348)));
-        towers.Add(new GeavanceerdeToren(new Vector2(450, 392)));
+        towers.Add(new GeanvanceerdeToren(new Vector2(450, 392)));
      
 
         while (!Raylib.WindowShouldClose())

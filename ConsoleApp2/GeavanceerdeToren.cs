@@ -1,28 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using TowerDefence.Interfaces;
 using TowerDefence.Model;
 
 namespace TowerDefence;
 
-internal class SpeciaalToren : IToren
+internal class GeanvanceerdeToren : BasicToren
 {
-    public string GeavanceerdeToren;
 
 
-    public void BasicToren_1(Vector2 position)
+
+    protected float Snelheid;
+
+
+    public GeanvanceerdeToren(Vector2 position) : base(position)
     {
         Positie = position;
         Schade = 8;
-        Afstand = 150.0f;
+        Afstand = 100;
         VuurRatio = 0.5f;
-       
-       if (BasicToren_1 = _currentTarget)
-       {
-            Snelheid -= 10;
-       }
     }
+    private float _currentTarget;
+   
+    public override void ValAan(float deltaTime)
+    {
+        _currentTarget.TakeDamage(Snelheid -= 10f);
+    }
+
+
+
+    
 
 }

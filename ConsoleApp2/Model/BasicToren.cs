@@ -8,11 +8,11 @@ public class BasicToren : IToren
 {
     private float _cooldownTimer = 0.0f;
     private IVijand _currentTarget;
-  public int Schade { get; }
-    public float Afstand { get; }
-    public float VuurRatio { get; }
-    public Vector2 Positie { get; }
-    public Vector3 positie { get; }
+  public int Schade { get; set; }
+    public float Afstand { get; set; }
+    public float VuurRatio { get; set; }
+    public Vector2 Positie { get; set; }
+    
     public BasicToren (Vector2 position)
     {
         Positie = position;
@@ -67,7 +67,7 @@ public class BasicToren : IToren
             Raylib.DrawLineV(Positie, _currentTarget.Position, Color.Yellow);
         }
     }
-    public void ValAan(float deltaTime)
+    public virtual void ValAan(float deltaTime)
     {
         
         _cooldownTimer = _cooldownTimer + deltaTime;
@@ -77,6 +77,7 @@ public class BasicToren : IToren
             if (_cooldownTimer >= VuurRatio)
             {
                 _currentTarget.TakeDamage(Schade);
+
                 _cooldownTimer = 0.0f;
             }
         }
