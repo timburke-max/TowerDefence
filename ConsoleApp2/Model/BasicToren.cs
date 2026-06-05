@@ -23,17 +23,7 @@ public class BasicToren : IToren
     }
 
     
-    public BasicToren_1 (Vector2 position)
-    {
-        Positie = position;
-        Schade = 8;
-        Afstand = 150.0f;
-        VuurRatio = 0.5f;
-            if (BasicToren_1 = _currentTarget)
-        {
-          Snelheid -= 10;
-        }
-    }
+   
 
  public void Update(List<IVijand> enemies, float deltaTime)
     {

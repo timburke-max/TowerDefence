@@ -31,7 +31,7 @@ class Programa
         towers.Add(new BasicToren(new Vector2(300, 200)));
         towers.Add(new BasicToren(new Vector2(500, 400)));
         towers.Add(new BasicToren(new Vector2(434, 348)));
-        towers.Add(new BasicToren_1(new Vector2(450, 392)));
+        towers.Add(new GeavanceerdeToren(new Vector2(450, 392)));
      
 
         while (!Raylib.WindowShouldClose())
