@@ -4,55 +4,78 @@ using TowerDefence.Interfaces;
 
 namespace TowerDefence.Model;
 
-public class BasicToren : IToren
+public class BasicToren: IToren
 {
-    private float _cooldownTimer = 0.0f;
-    private IVijand _currentTarget;
+    private float _cooldownTimer = 0f;
+    private IVijand? _currentTarget;
 
     public int Schade { get; }
     public float Afstand { get; }
     public float VuurRatio { get; }
-    public Vector2 Positie { get ;}
+    public Vector2 Positie { get; }
 
     public BasicToren(Vector2 position)
     {
         Positie = position;
         Schade = 25;
-        Afstand = 150.0f;
+        Afstand = 150f;
         VuurRatio = 0.5f;
-        //TODO: Maak andere torens met andere statistieken
     }
 
     public void Update(List<IVijand> enemies, float deltaTime)
     {
-        //TODO zorg dat de juiste functies worden opgeroepen met
-        // de juiste parameters
+        ZoekDoelwit(enemies);
+
+        if (_currentTarget is { IsAlive: true })
+        {
+            ValAan(deltaTime);
+        }
     }
 
-    private void ZoekDoelwit(List<IVijand> enemies) {
-        // TODO: Zoek een vijand binnen het bereik van de toren(Afstand)
-        // Denk na over wanneer van doelwit moeten gewisseld worden   
+    private void ZoekDoelwit(List<IVijand> enemies)
+    {
+        // Huidig doelwit ongeldig? Reset.
+        if (_currentTarget != null)
+        {
+            bool buitenBereik = Vector2.Distance(Positie, _currentTarget.Position) > Afstand;
+            if (!_currentTarget.IsAlive || buitenBereik)
+            {
+                _currentTarget = null;
+            }
+        }
+
+        // Nieuw doelwit zoeken
+        if (_currentTarget == null)
+        {
+            _currentTarget = enemies
+                .Where(e => e.IsAlive)
+                .FirstOrDefault(e => Vector2.Distance(Positie, e.Position) <= Afstand);
+        }
+    }
+
+    public void ValAan(float deltaTijd)
+    {
+        _cooldownTimer += deltaTijd;
+
+        if (_cooldownTimer >= VuurRatio)
+        {
+            _currentTarget?.TakeDamage(Schade);
+            _cooldownTimer = 0f;
+        }
     }
 
     public void Draw()
     {
-        // Teken de toren als een blauw vierkant
+        // Toren
         Raylib.DrawRectangle((int)Positie.X - 20, (int)Positie.Y - 20, 40, 40, Color.Blue);
 
-        // Teken de range-cirkel (lichtgrijs/transparant)
+        // Bereik
         Raylib.DrawCircleLines((int)Positie.X, (int)Positie.Y, Afstand, Color.LightGray);
 
-        // Als de toren een doelwit heeft, teken een laserstraal
-        if (_currentTarget != null && _currentTarget.IsAlive)
+        // Laserstraal
+        if (_currentTarget is { IsAlive: true })
         {
             Raylib.DrawLineV(Positie, _currentTarget.Position, Color.Yellow);
         }
-    }
-
-    public void ValAan(float deltaTime)
-    {
-        // TODO: Zorg dat de toren schade toebrengt aan zijn doelwit
-        // Zorg ervoor dat er een 'cooldown' is tussen aanvallen
-        // Gebruik VuurRatio en _cooldownTimer 
     }
 }

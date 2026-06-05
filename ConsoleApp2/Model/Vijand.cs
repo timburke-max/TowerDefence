@@ -4,19 +4,24 @@ using TowerDefence.Interfaces;
 
 namespace TowerDefence.Model;
 
-public abstract class Vijand : IVijand
-{
-    // TODO: Voeg extra voorwaarden toe, dat levenspunten van een 
-    // vijand niet onder nul kunnen en niet boven een maximum
-    // TODO: voeg een extra property MaximumLevensPunten toe
-    public int LevensPunten { get; protected set; }
+public abstract class Vijand : IVijand {
+    // MaximumLevensPunten slaat het maximale leven op (voor de health bar)
+    public int MaximumLevensPunten { get; protected set; }
+
+    // Backing field: de echte opslag van LevensPunten
+    private int _levensPunten;
+
+    // De setter gebruikt Math.Clamp zodat LP nooit onder 0 of boven het maximum gaat
+    public int LevensPunten {
+        get => _levensPunten;
+        protected set => _levensPunten = Math.Clamp(value, 0, MaximumLevensPunten);
+    }
+
     public Vector2 Position { get; protected set; }
-    public bool IsAlive
-    {
+
+    public bool IsAlive {
         get {
-            //TODO zorgt dat deze getter juist teruggeeft of 
-            // de vijand nog leeft of niet.
-            return true;
+            return LevensPunten > 0;
         }
     }
 
@@ -25,32 +30,39 @@ public abstract class Vijand : IVijand
     protected Color EnemyColor;
     protected float Grootte;
 
-    public Vijand(Vector2 startPosition, Vector2 targetPosition)
-    {
+    public Vijand(Vector2 startPosition, Vector2 targetPosition) {
         Position = startPosition;
         Target = targetPosition;
     }
 
-    public void Update(float deltaTime)
-    {
-        //TODO: Update de vijand
-        // Zorg dat hij beweegt naar het doel en stopt op het doel
-        // Hint: gebruik de functies van Vector2
+    public void Update(float deltaTijd) {
+        // Bereken de afstand tussen de vijand en het doel
+        float afstand = Vector2.Distance(Position, Target);
+
+        // Als de vijand dicht genoeg bij het doel is, stop dan (anders beweegt hij er voorbij)
+        if (afstand < 1.0f) {
+            Position = Target;
+            return;
+        }
+
+        // Bereken de richting: een genormaliseerde vector van lengte 1 die naar het doel wijst
+        Vector2 richting = Vector2.Normalize(Target - Position);
+
+        // Beweeg de vijand: richting * snelheid * tijd = aantal pixels deze frame
+        Position += richting * Snelheid * deltaTijd;
     }
 
-    public void TakeDamage(int amount)
-    {
-        //TODO: zorg dat de vijand schade krijgt
+    public void TakeDamage(int amount) {
+        LevensPunten -= amount;
     }
 
-    
-    public virtual void Draw()
-    {
-        if (IsAlive)
-        {
+    public virtual void Draw() {
+        if (IsAlive) {
             Raylib.DrawCircleV(Position, Grootte, EnemyColor);
-            // Teken een klein rood levensbalkje boven hun hoofd
-            Raylib.DrawRectangle((int)Position.X - 15, (int)Position.Y - (int)Grootte - 10, (int)(LevensPunten / 3.33f), 4, Color.Green);
+
+            // Health bar: breedte schaalt mee met het percentage LP dat nog over is
+            int breedte = (int)(30.0f * LevensPunten / MaximumLevensPunten);
+            Raylib.DrawRectangle((int)Position.X - 15, (int)Position.Y - (int)Grootte - 10, breedte, 4, Color.Green);
         }
     }
 }
