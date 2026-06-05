@@ -10,5 +10,6 @@ public interface IVijand : IDrawable
     void Update(float deltaTime);
     void TakeDamage(int amount);
     Vector2 getPosition();
+    void MultiplyStrength(float factor);
 
 }

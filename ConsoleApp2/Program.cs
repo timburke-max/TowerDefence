@@ -23,6 +23,7 @@ class Program
     static int nextSpawnDecreaseAt = 200;
     static int score = 0;
     static int punten = 0;
+    static float enemyStrengthMultiplier = 1.0f;
     static Random random = new Random();
     static int endHealth = 1000;
     static bool isGameOver = false;
@@ -128,19 +129,32 @@ class Program
         spawnTimer += deltaTime;
         if (spawnTimer >= spawnTime)
         {
-            int keuze = random.Next(20);
-            if (keuze <= 10)
-            {
-                enemies.Add(new BasicVijand(routeWaypoints));
-            }
-            else if (keuze <= 17)
-            {
-                enemies.Add(new AdvancedVijand(routeWaypoints));
-            }
+            double baseAdvanced = 7.0 / 20.0;
+            double baseBoss = 2.0 / 20.0;
+
+            double extra = Math.Clamp((enemyStrengthMultiplier - 1.0f) * 0.4, 0.0, 0.5);
+            double bossExtra = extra * 0.6;
+            double advExtra = extra * 0.4;
+
+            double bossProb = Math.Min(0.9, baseBoss + bossExtra);
+            double advProb = Math.Min(0.9, baseAdvanced + advExtra);
+            double basicProb = Math.Max(0.0, 1.0 - bossProb - advProb);
+
+            double r = random.NextDouble();
+            IVijand e;
+            if (r < basicProb)
+                e = new BasicVijand(routeWaypoints);
+            else if (r < basicProb + advProb)
+                e = new AdvancedVijand(routeWaypoints);
             else
+                e = new BossVijand(routeWaypoints);
+
+            if (enemyStrengthMultiplier != 1.0f)
             {
-                enemies.Add(new BossVijand(routeWaypoints));
+                e.MultiplyStrength(enemyStrengthMultiplier);
             }
+
+            enemies.Add(e);
 
             spawnTimer = 0.0f;
         }
@@ -154,6 +168,7 @@ class Program
             {
                 spawnTime = MathF.Max(minSpawnTime, spawnTime - spawnDecreaseAmount);
                 nextSpawnDecreaseAt += 200;
+                enemyStrengthMultiplier *= 1.2f;
             }
         }
     }
@@ -183,6 +198,8 @@ class Program
         towers.Clear();
         towers.Add(new BasicToren(new Vector2(schermBreedte * 0.35f, schermHoogte * 0.33f)));
         towers.Add(new AdvancedToren(new Vector2(schermBreedte * 0.65f, schermHoogte * 0.66f)));
+        placement.Reset();
+        TorenShop.SetStock(1, 1);
     }
 
     public static void draw()
@@ -236,11 +253,18 @@ class Program
         }
 
         Raylib.DrawText("Tower Defence", 10, 10, 24, Color.DarkGray);
+        string basicText = $"Basic: {TorenShop.GetPrice(Utilities.TorenPlacement.TorenType.Basic)} ( {TorenShop.GetStock(Utilities.TorenPlacement.TorenType.Basic)} )";
+        string advText = $"Advanced: {TorenShop.GetPrice(Utilities.TorenPlacement.TorenType.Advanced)} ( {TorenShop.GetStock(Utilities.TorenPlacement.TorenType.Advanced)} )";
+        int basicW = Raylib.MeasureText(basicText, 16);
+        int advW = Raylib.MeasureText(advText, 16);
+        int right = Raylib.GetScreenWidth() - 10;
+        Raylib.DrawText($"Punten: {punten}", right - Raylib.MeasureText($"Punten: {punten}", 16), 10, 16, Color.DarkGray);
+        Raylib.DrawText(basicText, right - basicW, 30, 16, Color.DarkGray);
+        Raylib.DrawText(advText, right - advW, 50, 16, Color.DarkGray);
         Raylib.DrawText($"Score: {score}", 10, 36, 16, Color.DarkGray);
-        Raylib.DrawText($"Vijanden: {enemies.Count}", 10, 56, 16, Color.DarkGray);
+        Raylib.DrawText($"Vijanden: {enemies.Count} ({enemyStrengthMultiplier:0.00}x)", 10, 56, 16, Color.DarkGray);
         Raylib.DrawText($"Spawn Time: {spawnTime:0.00}s", 10, 76, 16, Color.DarkGray);
         Raylib.DrawText($"Health: {endHealth}", 10, 96, 16, Color.DarkGray);
-        Raylib.DrawText($"Punten: {punten}", 10, 116, 16, Color.DarkGray);
 
         if (isGameOver)
         {

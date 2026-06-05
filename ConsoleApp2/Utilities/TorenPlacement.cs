@@ -21,7 +21,6 @@ internal class TorenPlacement
 
     public void Bijwerken(List<IToren> torens, List<Vector2> routeWaypoints, ref int punten)
     {
-        // Top-row numbers open placement menu
         if (Raylib.IsKeyPressed(KeyboardKey.One))
         {
             GekozenType = TorenType.Basic;

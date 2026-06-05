@@ -105,4 +105,12 @@ public abstract class Vijand : IVijand
     {
         return Position;
     }
+
+    public void MultiplyStrength(float factor)
+    {
+        if (factor <= 0f) return;
+        MaximumLevensPunten = (int)Math.Ceiling(MaximumLevensPunten * factor);
+        LevensPunten = (int)Math.Ceiling(LevensPunten * factor);
+        Snelheid *= factor;
+    }
 }
