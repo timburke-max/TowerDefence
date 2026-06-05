@@ -4,7 +4,7 @@ using TowerDefence.Interfaces;
 
 namespace TowerDefence.Model;
 
-public class BasicToren : IToren
+public class BasicToren2 : IToren
 {
     private float _cooldownTimer = 0.0f;
     private IVijand _currentTarget;
@@ -12,34 +12,32 @@ public class BasicToren : IToren
     public int Schade { get; }
     public float Afstand { get; }
     public float VuurRatio { get; }
-    public Vector2 Positie { get ;}
+    public Vector2 Positie { get; }
 
     public IVijand CurrentTarget => _currentTarget;
-
     public IVijand Target => _currentTarget;
 
-    public BasicToren(Vector2 position)
+    public BasicToren2(Vector2 position)
     {
         Positie = position;
-        Schade = 15;
-        Afstand = 150.0f;
-        VuurRatio = 0.5f;
+
+        
+        Schade = 50;         
+        Afstand = 150.0f; 
+        VuurRatio = 0.6f;    
     }
 
     public void Update(List<IVijand> enemies, float deltaTime)
     {
         ZoekDoelwit(enemies);
         ValAan(deltaTime);
-        
     }
 
     private void ZoekDoelwit(List<IVijand> enemies)
     {
-       
         if (_currentTarget != null && _currentTarget.IsAlive)
         {
             float distance = Vector2.Distance(Positie, _currentTarget.Position);
-
             if (distance <= Afstand)
                 return;
         }
@@ -62,20 +60,6 @@ public class BasicToren : IToren
         }
     }
 
-    public void Draw()
-    {
-        // Teken de toren als een blauw vierkant
-        Raylib.DrawRectangle((int)Positie.X - 20, (int)Positie.Y - 20, 40, 40, Color.Blue);
-
-        // Teken de range-cirkel (lichtgrijs/transparant)
-        Raylib.DrawCircleLines((int)Positie.X, (int)Positie.Y, Afstand, Color.LightGray);
-
-        // Als de toren een doelwit heeft, teken een laserstraal
-        if (_currentTarget != null && _currentTarget.IsAlive)
-        {
-            Raylib.DrawLineV(Positie, _currentTarget.Position, Color.Yellow);
-        }
-    }
     public void ValAan(float deltaTime)
     {
         if (_currentTarget == null || !_currentTarget.IsAlive)
@@ -86,9 +70,19 @@ public class BasicToren : IToren
         if (_cooldownTimer >= VuurRatio)
         {
             _currentTarget.TakeDamage(Schade);
-            _cooldownTimer = 0.0f;
+            _cooldownTimer = 0f;
         }
     }
 
+    public void Draw()
+    {
+        Raylib.DrawRectangle((int)Positie.X - 20, (int)Positie.Y - 20, 40, 40, Color.Red);
 
+        Raylib.DrawCircleLines((int)Positie.X, (int)Positie.Y, Afstand, Color.LightGray);
+
+        if (_currentTarget != null && _currentTarget.IsAlive)
+        {
+            Raylib.DrawLineV(Positie, _currentTarget.Position, Color.Orange);
+        }
+    }
 }

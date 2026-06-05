@@ -6,17 +6,15 @@ namespace TowerDefence.Model;
 
 public abstract class Vijand : IVijand
 {
-    // TODO: Voeg extra voorwaarden toe, dat levenspunten van een 
-    // vijand niet onder nul kunnen en niet boven een maximum
-    // TODO: voeg een extra property MaximumLevensPunten toe
+   
     public int LevensPunten { get; protected set; }
     public Vector2 Position { get; protected set; }
+    public int MaximumLevensPunten { get; protected set; }
     public bool IsAlive
-    {
+    { 
         get {
-            //TODO zorgt dat deze getter juist teruggeeft of 
-            // de vijand nog leeft of niet.
-            return true;
+            return LevensPunten > 0;
+
         }
     }
 
@@ -33,14 +31,28 @@ public abstract class Vijand : IVijand
 
     public void Update(float deltaTime)
     {
-        //TODO: Update de vijand
-        // Zorg dat hij beweegt naar het doel en stopt op het doel
-        // Hint: gebruik de functies van Vector2
+        if (!IsAlive)
+            return;
+
+        Vector2 direction = Target - Position;
+
+        float distance = direction.Length();
+
+        if (distance < 1f)
+            return;
+
+        direction = Vector2.Normalize(direction);
+
+        Position += direction * Snelheid * deltaTime;
     }
 
     public void TakeDamage(int amount)
     {
-        //TODO: zorg dat de vijand schade krijgt
+        LevensPunten -= amount;
+
+        if (LevensPunten < 0)
+            LevensPunten = 0;
+        LevensPunten = Math.Clamp(LevensPunten, 0, MaximumLevensPunten);
     }
 
     
