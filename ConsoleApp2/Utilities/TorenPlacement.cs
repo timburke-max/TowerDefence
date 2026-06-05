@@ -18,76 +18,38 @@ internal class TorenPlacement
     private const int MinSeparationXY = 50;
 
     private Vector2 plaatsPos = Vector2.Zero;
-    private float basicHoldTimer = 0f;
-    private float advancedHoldTimer = 0f;
-    private bool basicKeyPressed = false;
-    private bool advancedKeyPressed = false;
-    private const float HoldThreshold = 0.5f;
 
-    public void Bijwerken(List<IToren> torens, List<Vector2> routeWaypoints, ref int punten, float deltaTime)
+    public void Bijwerken(List<IToren> torens, List<Vector2> routeWaypoints, ref int punten)
     {
-        bool oneDown = Raylib.IsKeyDown(KeyboardKey.One);
-        bool twoDown = Raylib.IsKeyDown(KeyboardKey.Two);
-        bool shiftDown = Raylib.IsKeyDown(KeyboardKey.LeftShift) || Raylib.IsKeyDown(KeyboardKey.RightShift);
-
-        if (oneDown && !shiftDown)
+        // Top-row numbers open placement menu
+        if (Raylib.IsKeyPressed(KeyboardKey.One))
         {
-            if (!basicKeyPressed)
-            {
-                basicKeyPressed = true;
-                basicHoldTimer = 0f;
-            }
-            basicHoldTimer += deltaTime;
-            if (basicHoldTimer >= HoldThreshold)
-            {
-                int cost = 500;
-                if (punten >= cost)
-                {
-                    punten -= cost;
-                    TorenShop.AddStock(TorenType.Basic, 1);
-                    basicHoldTimer -= HoldThreshold;
-                }
-            }
+            GekozenType = TorenType.Basic;
+            IsPlaatsen = true;
         }
-        else if (basicKeyPressed && !oneDown)
+        if (Raylib.IsKeyPressed(KeyboardKey.Two))
         {
-            if (basicHoldTimer < HoldThreshold)
-            {
-                GekozenType = TorenType.Basic;
-                IsPlaatsen = true;
-            }
-            basicKeyPressed = false;
-            basicHoldTimer = 0f;
+            GekozenType = TorenType.Advanced;
+            IsPlaatsen = true;
         }
 
-        if (twoDown)
+        if (Raylib.IsKeyPressed((KeyboardKey)321))
         {
-            if (!advancedKeyPressed)
+            int cost = 500;
+            if (punten >= cost)
             {
-                advancedKeyPressed = true;
-                advancedHoldTimer = 0f;
-            }
-            advancedHoldTimer += deltaTime;
-            if (advancedHoldTimer >= HoldThreshold && shiftDown)
-            {
-                int cost = 750;
-                if (punten >= cost)
-                {
-                    punten -= cost;
-                    TorenShop.AddStock(TorenType.Advanced, 1);
-                    advancedHoldTimer -= HoldThreshold;
-                }
+                punten -= cost;
+                TorenShop.AddStock(TorenType.Basic, 1);
             }
         }
-        else if (advancedKeyPressed && !twoDown)
+        if (Raylib.IsKeyPressed((KeyboardKey)322))
         {
-            if (advancedHoldTimer < HoldThreshold)
+            int cost = 750;
+            if (punten >= cost)
             {
-                GekozenType = TorenType.Advanced;
-                IsPlaatsen = true;
+                punten -= cost;
+                TorenShop.AddStock(TorenType.Advanced, 1);
             }
-            advancedKeyPressed = false;
-            advancedHoldTimer = 0f;
         }
 
         if (Raylib.IsKeyPressed(KeyboardKey.Zero))
@@ -110,6 +72,7 @@ internal class TorenPlacement
             if (!geldig) return;
 
             if (!TorenShop.HasStock(GekozenType)) return;
+
             if (GekozenType == TorenType.Basic)
                 torens.Add(new BasicToren(plaatsPos));
             else

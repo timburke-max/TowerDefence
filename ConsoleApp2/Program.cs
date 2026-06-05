@@ -70,7 +70,7 @@ class Program
 
         float deltaTime = Raylib.GetFrameTime();
         updateEntities(deltaTime);
-        placement.Bijwerken(towers, routeWaypoints, ref punten, deltaTime);
+        placement.Bijwerken(towers, routeWaypoints, ref punten);
         if (placement.HeeftMinstensEenGeplaatst)
             spawnEnemies(deltaTime);
     }
@@ -160,19 +160,19 @@ class Program
 
     private static void RestartGame()
     {
-            enemies.Clear();
-            score = 0;
-            punten = 0;
-            spawnTime = 4.0f;
-            spawnTimer = 0.0f;
-            nextSpawnDecreaseAt = 200;
-            endHealth = 100;
-            isGameOver = false;
-            spawnPunt = new Vector2(schermBreedte * 0.05f, schermHoogte * 0.5f);
-            doelPunt = new Vector2(schermBreedte * 0.95f, schermHoogte * 0.5f);
+        enemies.Clear();
+        score = 0;
+        punten = 0;
+        spawnTime = 4.0f;
+        spawnTimer = 0.0f;
+        nextSpawnDecreaseAt = 200;
+        endHealth = 100;
+        isGameOver = false;
+        spawnPunt = new Vector2(schermBreedte * 0.05f, schermHoogte * 0.5f);
+        doelPunt = new Vector2(schermBreedte * 0.95f, schermHoogte * 0.5f);
 
-            float amplitude = 120f;
-            routeWaypoints = new List<Vector2>
+        float amplitude = 120f;
+        routeWaypoints = new List<Vector2>
         {
             spawnPunt,
             new Vector2(spawnPunt.X + (doelPunt.X - spawnPunt.X) * 0.33f, spawnPunt.Y - amplitude),
@@ -180,10 +180,10 @@ class Program
             doelPunt
         };
 
-            towers.Clear();
-            towers.Add(new BasicToren(new Vector2(schermBreedte * 0.35f, schermHoogte * 0.33f)));
-            towers.Add(new AdvancedToren(new Vector2(schermBreedte * 0.65f, schermHoogte * 0.66f)));
-        }
+        towers.Clear();
+        towers.Add(new BasicToren(new Vector2(schermBreedte * 0.35f, schermHoogte * 0.33f)));
+        towers.Add(new AdvancedToren(new Vector2(schermBreedte * 0.65f, schermHoogte * 0.66f)));
+    }
 
     public static void draw()
     {
@@ -208,7 +208,7 @@ class Program
         endPercentage = Math.Max(0f, Math.Min(1f, endPercentage));
         int fullBarWidth = 30;
         int barHeight = 4;
-        var barTopLeft = new Vector2(doelPunt.X - fullBarWidth/2f, doelPunt.Y - 25f);
+        var barTopLeft = new Vector2(doelPunt.X - fullBarWidth / 2f, doelPunt.Y - 25f);
         int barWidthScreen = Math.Max(1, fullBarWidth);
         int barHeightScreen = Math.Max(1, barHeight);
         Raylib.DrawRectangle((int)barTopLeft.X, (int)barTopLeft.Y, barWidthScreen, barHeightScreen, Color.Red);
