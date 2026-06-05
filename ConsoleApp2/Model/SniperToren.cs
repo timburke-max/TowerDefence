@@ -4,7 +4,7 @@ using TowerDefence.Interfaces;
 
 namespace TowerDefence.Model;
 
-public class BasicToren : IToren {
+public class SniperToren : IToren {
     private float _cooldownTimer = 0.0f;
     private IVijand? _currentTarget;
 
@@ -12,13 +12,13 @@ public class BasicToren : IToren {
     public float Afstand { get; }
     public float VuurRatio { get; }
     public Vector2 Positie { get; }
-    public int Kosten => 100;   // kost 100g om te kopen
+    public int Kosten => 200;   // kost 200g om te kopen
 
-    public BasicToren(Vector2 position) {
+    public SniperToren(Vector2 position) {
         Positie = position;
-        Schade = 25;
-        Afstand = 250.0f;
-        VuurRatio = 0.5f;
+        Schade = 100;
+        Afstand = 450.0f;
+        VuurRatio = 2.0f;
     }
 
     public void Update(List<IVijand> enemies, float deltaTime) {
@@ -51,9 +51,9 @@ public class BasicToren : IToren {
     }
 
     public void Draw() {
-        Raylib.DrawRectangle((int)Positie.X - 20, (int)Positie.Y - 20, 40, 40, Color.Blue);
+        Raylib.DrawRectangle((int)Positie.X - 20, (int)Positie.Y - 20, 40, 40, Color.Purple);
         Raylib.DrawCircleLines((int)Positie.X, (int)Positie.Y, Afstand, Color.LightGray);
         if (_currentTarget != null && _currentTarget.IsAlive)
-            Raylib.DrawLineV(Positie, _currentTarget.Position, Color.Yellow);
+            Raylib.DrawLineV(Positie, _currentTarget.Position, Color.Red);
     }
 }

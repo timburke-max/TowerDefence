@@ -3,8 +3,8 @@ using Raylib_cs;
 
 namespace TowerDefence.Model;
 
-public class BasicVijand : Vijand {
-    public BasicVijand(List<Vector2> padPunten, Difficulty moeilijkheid) : base(padPunten) {
+public class StelleVijand : Vijand {
+    public StelleVijand(List<Vector2> padPunten, Difficulty moeilijkheid) : base(padPunten) {
         float hpMultiplier = moeilijkheid switch {
             Difficulty.Easy => 0.7f,
             Difficulty.Medium => 1.0f,
@@ -18,11 +18,11 @@ public class BasicVijand : Vijand {
             _ => 1.0f
         };
 
-        MaximumLevensPunten = (int)(200 * hpMultiplier);
+        MaximumLevensPunten = (int)(80 * hpMultiplier);
         LevensPunten = MaximumLevensPunten;
-        Snelheid = 40.0f * snelheidMultiplier;
-        Grootte = 35.0f;
-        EnemyColor = Color.DarkGreen;
-        Beloning = 20;  // speler krijgt 20g als deze vijand sterft
+        Snelheid = 90.0f * snelheidMultiplier;
+        Grootte = 18.0f;
+        EnemyColor = Color.Red;
+        Beloning = 10;  // snel maar minder waard: 10g
     }
 }
